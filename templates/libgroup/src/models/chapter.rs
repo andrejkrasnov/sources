@@ -26,13 +26,16 @@ pub struct LibGroupChapterBranch {
 	pub teams: Vec<LibGroupTeam>,
 	pub user: LibGroupChapterBranchUser,
 	pub restricted_view: Option<LibGroupRestrictedView>,
-	pub moderation: Option<LibGroupModerated>,
+	#[serde(default)]
+	pub expired_type: i32,
 }
 
 #[derive(Default, Deserialize, Debug, Clone)]
 #[serde(default)]
 pub struct LibGroupChapterBranchUser {
 	pub username: String,
+	#[serde(default)]
+	pub id: Option<i32>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -75,14 +78,42 @@ pub struct LibGroupPage {
 }
 
 #[derive(Deserialize, Debug, Clone)]
+#[serde(default)]
 pub struct LibGroupImageChapter {
+	#[serde(default)]
 	pub pages: Vec<LibGroupPage>,
+	#[serde(default)]
+	pub moderated: Option<LibGroupModerated>,
+}
+
+impl Default for LibGroupImageChapter {
+	fn default() -> Self {
+		Self {
+			pages: Vec::new(),
+			moderated: None,
+		}
+	}
 }
 
 #[derive(Deserialize, Debug, Clone)]
+#[serde(default)]
 pub struct LibGroupTextChapter {
+	#[serde(default)]
 	pub content: LibGroupContentType,
+	#[serde(default)]
 	pub attachments: Vec<LibGroupAttachment>,
+	#[serde(default)]
+	pub moderated: Option<LibGroupModerated>,
+}
+
+impl Default for LibGroupTextChapter {
+	fn default() -> Self {
+		Self {
+			content: LibGroupContentType::Html(String::new()),
+			attachments: Vec::new(),
+			moderated: None,
+		}
+	}
 }
 
 #[derive(Debug, Clone)]
@@ -196,12 +227,7 @@ impl LibGroupChapterListItem {
 					.restricted_view
 					.as_ref()
 					.map(|rv| !rv.is_open)
-					.unwrap_or(false)
-					|| branch
-						.moderation
-						.as_ref()
-						.map(|m| m.label == "На модерации")
-						.unwrap_or(false);
+					.unwrap_or(false);
 
 				Chapter {
 					key: branch.id.to_string(),
