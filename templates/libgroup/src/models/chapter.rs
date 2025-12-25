@@ -26,13 +26,18 @@ pub struct LibGroupChapterBranch {
 	pub teams: Vec<LibGroupTeam>,
 	pub user: LibGroupChapterBranchUser,
 	pub restricted_view: Option<LibGroupRestrictedView>,
+	#[serde(rename = "moderated")]
 	pub moderation: Option<LibGroupModerated>,
+	#[serde(default)]
+	pub expired_type: i32,
 }
 
 #[derive(Default, Deserialize, Debug, Clone)]
 #[serde(default)]
 pub struct LibGroupChapterBranchUser {
 	pub username: String,
+	#[serde(default)]
+	pub id: Option<i32>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -75,14 +80,36 @@ pub struct LibGroupPage {
 }
 
 #[derive(Deserialize, Debug, Clone)]
+#[serde(default)]
 pub struct LibGroupImageChapter {
+	#[serde(default)]
 	pub pages: Vec<LibGroupPage>,
 }
 
+impl Default for LibGroupImageChapter {
+	fn default() -> Self {
+		Self {
+			pages: Vec::new(),
+		}
+	}
+}
+
 #[derive(Deserialize, Debug, Clone)]
+#[serde(default)]
 pub struct LibGroupTextChapter {
+	#[serde(default)]
 	pub content: LibGroupContentType,
+	#[serde(default)]
 	pub attachments: Vec<LibGroupAttachment>,
+}
+
+impl Default for LibGroupTextChapter {
+	fn default() -> Self {
+		Self {
+			content: LibGroupContentType::Html(String::new()),
+			attachments: Vec::new(),
+		}
+	}
 }
 
 #[derive(Debug, Clone)]
